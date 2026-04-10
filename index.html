@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>朝刊 — 毎日新聞AI版</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1208;
+    --ink-light: #3d3020;
+    --paper: #f5f0e8;
+    --paper-dark: #ede7d6;
+    --paper-mid: #f0ead8;
+    --rule: #8b7355;
+    --rule-light: #c4b59a;
+    --red: #8b1a1a;
+    --gold: #b8960c;
+    --shadow: rgba(26,18,8,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #d4cbb8;
+    font-family: 'Noto Serif JP', serif;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 20px;
+    background-image: 
+      repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(0,0,0,0.03) 28px, rgba(0,0,0,0.03) 29px);
+  }
+
+  /* ── MASTHEAD ─────────────────────────────────── */
+  .masthead {
+    background: var(--paper);
+    border-top: 6px solid var(--ink);
+    border-bottom: 3px solid var(--ink);
+    text-align: center;
+    padding: 12px 20px 8px;
+    position: relative;
+    box-shadow: 0 4px 20px var(--shadow);
+  }
+  .masthead::before {
+    content: '';
+    display: block;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 8px;
+  }
+
+  .masthead-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 11px;
+    color: var(--ink-light);
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .masthead-meta span { flex: 1; }
+  .masthead-meta span:nth-child(2) { text-align: center; }
+  .masthead-meta span:last-child { text-align: right; }
+
+  .masthead h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 7vw, 72px);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--ink);
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.15);
+  }
+  .masthead h1 em {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--red);
+    font-size: 0.6em;
+    display: block;
+    letter-spacing: 0.2em;
+    margin-bottom: 2px;
+  }
+
+  .masthead-tagline {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-light);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .edition-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-top: 8px;
+    border-top: 1px solid var(--rule);
+    padding-top: 6px;
+  }
+  .edition-badge {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    padding: 2px 12px;
+  }
+  .edition-badge.red { background: var(--red); }
+
+  /* ── TICKER ───────────────────────────────────── */
+  .ticker-wrap {
+    background: var(--ink);
+    color: var(--paper);
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 5px 0;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    position: relative;
+    margin-bottom: 0;
+  }
+  .ticker-label {
+    background: var(--red);
+    color: #fff;
+    font-weight: 700;
+    padding: 0 10px;
+    margin-right: 10px;
+    display: inline-block;
+  }
+  .ticker-content {
+    display: inline-block;
+    animation: ticker 60s linear infinite;
+  }
+  @keyframes ticker {
+    0% { transform: translateX(100vw); }
+    100% { transform: translateX(-100%); }
+  }
+
+  /* ── LAYOUT ───────────────────────────────────── */
+  .newspaper {
+    background: var(--paper);
+    max-width: 1200px;
+    margin: 0 auto;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px 8px;
+    border-top: 3px double var(--ink);
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper-mid);
+    margin-top: 0;
+  }
+  .section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.05em;
+  }
+  .section-header .section-label {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    letter-spacing: 0.1em;
+  }
+  .section-header.red-accent .section-label { background: var(--red); }
+  .section-header.gold-accent .section-label { background: var(--gold); }
+
+  /* ── NEWS CONTENT AREA ────────────────────────── */
+  .news-section {
+    padding: 0;
+  }
+
+  .columns {
+    display: grid;
+    gap: 0;
+    border-bottom: 2px solid var(--rule);
+  }
+  .columns.col-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .columns.col-2 { grid-template-columns: 2fr 1fr; }
+  .columns.col-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .columns.col-lead { grid-template-columns: 3fr 2fr; }
+
+  .article {
+    padding: 16px 18px;
+    border-right: 1px solid var(--rule-light);
+    position: relative;
+  }
+  .article:last-child { border-right: none; }
+
+  .article-cat {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .article-cat::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 1px;
+    background: var(--red);
+  }
+
+  .article h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(14px, 2vw, 20px);
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  .article.lead h3 {
+    font-size: clamp(18px, 2.5vw, 26px);
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+  }
+
+  .article-deck {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-light);
+    line-height: 1.5;
+    margin-bottom: 8px;
+    font-style: italic;
+  }
+
+  .article p {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 13px;
+    line-height: 1.9;
+    color: var(--ink);
+    margin-bottom: 8px;
+    text-align: justify;
+    hyphens: auto;
+  }
+  .article p:first-of-type::first-letter {
+    font-size: 2.8em;
+    font-weight: 900;
+    float: left;
+    line-height: 0.85;
+    margin: 4px 6px 0 0;
+    color: var(--ink);
+    font-family: 'Playfair Display', serif;
+  }
+
+  .article-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+    margin-bottom: 8px;
+    filter: sepia(15%) contrast(1.05);
+    border: 1px solid var(--rule-light);
+  }
+  .article-img.tall { height: 240px; }
+  .img-caption {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 10px;
+    color: var(--ink-light);
+    border-left: 2px solid var(--rule);
+    padding-left: 6px;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  .byline {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 10px;
+    color: var(--rule);
+    letter-spacing: 0.05em;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--rule-light);
+  }
+
+  .pull-quote {
+    border-left: 4px solid var(--ink);
+    border-right: 4px solid var(--ink);
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--ink);
+    background: var(--paper-dark);
+    text-align: center;
+  }
+
+  /* ── FUNNY BOX ────────────────────────────────── */
+  .funny-box {
+    background: var(--paper-dark);
+    border: 2px dashed var(--rule);
+    padding: 14px 16px;
+    margin: 8px 0;
+    position: relative;
+  }
+  .funny-box::before {
+    content: '☞';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    font-size: 20px;
+    color: var(--gold);
+  }
+
+  /* ── DATA BOX ─────────────────────────────────── */
+  .data-box {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 12px 14px;
+    margin: 10px 0;
+  }
+  .data-box h4 {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    margin-bottom: 8px;
+    color: var(--gold);
+  }
+  .data-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .data-row .val { font-weight: 700; }
+  .data-row .up { color: #e74c3c; }
+  .data-row .down { color: #3498db; }
+
+  /* ── FOOTER ───────────────────────────────────── */
+  .footer {
+    background: var(--ink);
+    color: var(--paper);
+    text-align: center;
+    padding: 12px 20px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    opacity: 0.9;
+  }
+
+  /* ── LOADING ──────────────────────────────────── */
+  #loading-overlay {
+    position: fixed; inset: 0;
+    background: var(--paper);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 999;
+    gap: 20px;
+  }
+  .loading-press {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--ink);
+    animation: pressFlash 1.2s ease-in-out infinite alternate;
+  }
+  @keyframes pressFlash {
+    from { opacity: 0.3; letter-spacing: -0.02em; }
+    to { opacity: 1; letter-spacing: 0.05em; }
+  }
+  .loading-bar-wrap {
+    width: 300px;
+    height: 4px;
+    background: var(--rule-light);
+    position: relative;
+    overflow: hidden;
+  }
+  .loading-bar-fill {
+    height: 100%;
+    background: var(--ink);
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+  .loading-status {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    color: var(--ink-light);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── PROGRESS STEPS ───────────────────────────── */
+  .progress-steps {
+    display: flex; flex-direction: column; gap: 6px;
+    width: 300px;
+    margin-top: 8px;
+  }
+  .step {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 11px;
+    color: var(--rule);
+    opacity: 0.4;
+    transition: all 0.4s;
+  }
+  .step.active { color: var(--ink); opacity: 1; }
+  .step.done { color: var(--red); opacity: 1; }
+  .step-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: currentColor; flex-shrink: 0;
+  }
+
+  /* ── UPDATE STATUS ────────────────────────────── */
+  #update-status {
+    position: fixed;
+    bottom: 16px; right: 16px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 11px;
+    padding: 6px 12px;
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+    z-index: 100;
+  }
+  #update-status.show { opacity: 1; }
+
+  @media (max-width: 768px) {
+    .columns.col-3, .columns.col-lead, .columns.col-2 { grid-template-columns: 1fr; }
+    .columns.col-4 { grid-template-columns: 1fr 1fr; }
+    body { padding: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div id="loading-overlay">
+  <div class="loading-press">朝刊 AI</div>
+  <div class="loading-bar-wrap">
+    <div class="loading-bar-fill" id="loading-bar"></div>
+  </div>
+  <div class="loading-status" id="loading-status">最新ニュースを収集中...</div>
+  <div class="progress-steps" id="progress-steps">
+    <div class="step" id="step-world"><span class="step-dot"></span>世界情勢を取材中</div>
+    <div class="step" id="step-economy"><span class="step-dot"></span>経済情報を分析中</div>
+    <div class="step" id="step-society"><span class="step-dot"></span>国内社会ニュースを収集中</div>
+    <div class="step" id="step-funny"><span class="step-dot"></span>おもしろニュースを選別中</div>
+    <div class="step" id="step-layout"><span class="step-dot"></span>紙面をレイアウト中</div>
+  </div>
+</div>
+
+<!-- Newspaper -->
+<div class="newspaper" id="newspaper" style="display:none">
+
+  <!-- Masthead -->
+  <div class="masthead">
+    <div class="masthead-meta">
+      <span id="edition-date">—</span>
+      <span>AI版 朝刊</span>
+      <span>定価 無料（毎朝７時更新）</span>
+    </div>
+    <h1>
+      <em>The Morning Digest</em>
+      朝刊タイムズ
+    </h1>
+    <div class="masthead-tagline">"すべての真実は、印刷された紙の上に宿る"</div>
+    <div class="edition-bar">
+      <span class="edition-badge red">速報</span>
+      <span class="edition-badge">朝刊</span>
+      <span class="edition-badge">AI 編集</span>
+    </div>
+  </div>
+
+  <!-- Ticker -->
+  <div class="ticker-wrap">
+    <span class="ticker-label">速報</span>
+    <span class="ticker-content" id="ticker-text">最新ニュースを取得中...</span>
+  </div>
+
+  <!-- Main content injected by JS -->
+  <div id="news-content"></div>
+
+  <div class="footer">
+    朝刊タイムズ AI版 ─ 毎朝７時自動更新 ─ Claude AI によるニュース解説 ─ 画像は各メディア提供 ─ <span id="footer-date"></span>
+  </div>
+</div>
+
+<div id="update-status">🗞 更新中...</div>
+
+<script>
+// ── CONFIG ─────────────────────────────────────────────
+const UPDATE_HOUR = 7; // 毎朝7時更新
+const STORAGE_KEY = 'asa_news_cache';
+const CACHE_TTL = 23 * 60 * 60 * 1000; // 23 hours
+
+// ── HELPERS ────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const setProgress = (pct, msg) => {
+  $('loading-bar').style.width = pct + '%';
+  $('loading-status').textContent = msg;
+};
+const activateStep = id => {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  const el = $(id); if (el) el.classList.add('active');
+};
+const doneStep = id => { const el = $(id); if (el) { el.classList.remove('active'); el.classList.add('done'); } };
+
+function formatDate(d = new Date()) {
+  const days = ['日','月','火','水','木','金','土'];
+  return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${days[d.getDay()]}）`;
+}
+
+// ── CLAUDE API CALL ────────────────────────────────────
+async function fetchNewsFromClaude(section, prompt) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const data = await res.json();
+  // Extract text from content blocks
+  return data.content
+    .filter(b => b.type === 'text')
+    .map(b => b.text)
+    .join('');
+}
+
+// ── NEWS PROMPTS ───────────────────────────────────────
+const TODAY = formatDate();
+
+const prompts = {
+  world: `今日（${TODAY}）の世界情勢の最新ニュースをウェブ検索で取得し、以下のJSON形式だけで出力してください。前置きやMarkdownは不要。
+{
+  "ticker": "速報テキスト（3件、「／」区切り）",
+  "articles": [
+    {
+      "cat": "カテゴリ",
+      "title": "見出し（30字以内）",
+      "deck": "サブ見出し（40字以内）",
+      "body": "本文（600字程度、具体的数字・固有名詞を含む）",
+      "quote": "引用文（40字以内）",
+      "source": "情報源",
+      "imageQuery": "英語で画像検索クエリ（具体的な場所・人物・出来事）"
+    }
+  ]
+}
+記事は3本（うち1本はリード記事）。テーマ：地政学、紛争、外交、国際機関。必ず今日の実際のニュースを使用。`,
+
+  economy: `今日（${TODAY}）の国際・国内経済ニュースをウェブ検索で取得し、以下のJSON形式だけで出力してください。前置きやMarkdownは不要。
+{
+  "markets": [
+    {"name":"日経平均","val":"数値","change":"+/-数値","dir":"up/down"},
+    {"name":"NYダウ","val":"数値","change":"+/-数値","dir":"up/down"},
+    {"name":"ドル/円","val":"数値","change":"+/-数値","dir":"up/down"},
+    {"name":"原油(WTI)","val":"数値","change":"+/-数値","dir":"up/down"}
+  ],
+  "articles": [
+    {
+      "cat": "カテゴリ",
+      "title": "見出し（30字以内）",
+      "deck": "サブ見出し（40字以内）",
+      "body": "本文（500字程度）",
+      "source": "情報源",
+      "imageQuery": "英語で画像検索クエリ"
+    }
+  ]
+}
+記事は3本。テーマ：株式市場、貿易、企業決算、インフレ、日本経済。必ず今日の実際のニュースを使用。`,
+
+  society: `今日（${TODAY}）の日本国内社会ニュースをウェブ検索で取得し、以下のJSON形式だけで出力してください。前置きやMarkdownは不要。
+{
+  "articles": [
+    {
+      "cat": "カテゴリ",
+      "title": "見出し（30字以内）",
+      "deck": "サブ見出し（40字以内）",
+      "body": "本文（500字程度）",
+      "source": "情報源",
+      "imageQuery": "英語で画像検索クエリ（日本関連）"
+    }
+  ]
+}
+記事は3本。テーマ：政治、社会問題、災害、科学技術、文化。必ず今日の実際の日本のニュースを使用。`,
+
+  funny: `今日（${TODAY}）のユニーク・おもしろ・ほっこりニュースをウェブ検索で取得し、以下のJSON形式だけで出力してください。前置きやMarkdownは不要。
+{
+  "articles": [
+    {
+      "cat": "ほっこり",
+      "title": "見出し（25字以内、ユーモアを含む）",
+      "body": "本文（300字程度、軽いトーンで）",
+      "imageQuery": "英語で画像検索クエリ（明るい内容）"
+    }
+  ]
+}
+記事は2本。世界や日本の珍ニュース、ほっこりするエピソード、意外な発見など。`
+};
+
+// ── IMAGE FETCHER ──────────────────────────────────────
+async function fetchImage(query) {
+  try {
+    const res = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=1&client_id=demokey_fallback`);
+    // Unsplash might fail; use placeholder with relevant keyword
+  } catch(e) {}
+  // Reliable fallback using Picsum with seed from query
+  const seed = query.split('').reduce((a,c) => a + c.charCodeAt(0), 0);
+  return `https://picsum.photos/seed/${seed % 1000}/600/300`;
+}
+
+// ── SAFE JSON PARSE ────────────────────────────────────
+function safeJSON(text) {
+  try {
+    const clean = text.replace(/```json|```/g, '').trim();
+    const start = clean.indexOf('{');
+    const end = clean.lastIndexOf('}');
+    if (start === -1 || end === -1) throw new Error('No JSON');
+    return JSON.parse(clean.slice(start, end + 1));
+  } catch(e) {
+    console.warn('JSON parse failed:', e, text);
+    return null;
+  }
+}
+
+// ── HTML BUILDERS ──────────────────────────────────────
+function buildWorldSection(data) {
+  const arts = data.articles || [];
+  const lead = arts[0] || {};
+  const subs = arts.slice(1);
+
+  return `
+  <div class="section-header red-accent">
+    <span class="section-label">WORLD</span>
+    <h2>世界情勢 — International Affairs</h2>
+  </div>
+  <div class="news-section">
+    <div class="columns col-lead">
+      <div class="article lead">
+        <div class="article-cat">${lead.cat || '国際'}</div>
+        <h3>${lead.title || '—'}</h3>
+        <div class="article-deck">${lead.deck || ''}</div>
+        <img class="article-img tall" src="${lead.imgUrl || 'https://picsum.photos/seed/world/600/300'}" alt="${lead.title}" onerror="this.src='https://picsum.photos/seed/news/600/300'">
+        <div class="img-caption">📷 ${lead.source || '各社報道'}</div>
+        <p>${(lead.body || '').slice(0, 400)}</p>
+        ${lead.quote ? `<div class="pull-quote">"${lead.quote}"</div>` : ''}
+        <p>${(lead.body || '').slice(400)}</p>
+        <div class="byline">取材・編集：AI特派員 ｜ 出典：${lead.source || '各社'}</div>
+      </div>
+      <div>
+        ${subs.map(a => `
+        <div class="article">
+          <div class="article-cat">${a.cat || '国際'}</div>
+          <h3>${a.title || '—'}</h3>
+          <img class="article-img" src="${a.imgUrl || 'https://picsum.photos/seed/intl/600/300'}" alt="${a.title}" onerror="this.src='https://picsum.photos/seed/globe/600/300'">
+          <div class="img-caption">📷 ${a.source || '各社'}</div>
+          <p>${a.body || ''}</p>
+          <div class="byline">出典：${a.source || '各社'}</div>
+        </div>
+        `).join('<hr style="border:none;border-top:1px solid var(--rule-light)">')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildEconomySection(data) {
+  const arts = data.articles || [];
+  const markets = data.markets || [];
+
+  const marketHTML = markets.length ? `
+  <div class="data-box">
+    <h4>▸ 本日の市場動向</h4>
+    ${markets.map(m => `
+    <div class="data-row">
+      <span>${m.name}</span>
+      <span class="val ${m.dir}">${m.val} <small>${m.change}</small></span>
+    </div>`).join('')}
+  </div>` : '';
+
+  return `
+  <div class="section-header gold-accent">
+    <span class="section-label">ECONOMY</span>
+    <h2>経済 — Markets & Business</h2>
+  </div>
+  <div class="news-section">
+    <div class="columns col-3">
+      <div class="article">
+        ${marketHTML}
+        ${arts[0] ? `
+        <div class="article-cat">${arts[0].cat || '経済'}</div>
+        <h3>${arts[0].title || '—'}</h3>
+        <img class="article-img" src="${arts[0].imgUrl || 'https://picsum.photos/seed/econ/600/300'}" alt="" onerror="this.src='https://picsum.photos/seed/finance/600/300'">
+        <p>${arts[0].body || ''}</p>
+        <div class="byline">出典：${arts[0].source || '各社'}</div>
+        ` : ''}
+      </div>
+      ${arts.slice(1).map(a => `
+      <div class="article">
+        <div class="article-cat">${a.cat || '経済'}</div>
+        <h3>${a.title || '—'}</h3>
+        <img class="article-img" src="${a.imgUrl || 'https://picsum.photos/seed/market/600/300'}" alt="" onerror="this.src='https://picsum.photos/seed/trade/600/300'">
+        <p>${a.body || ''}</p>
+        <div class="byline">出典：${a.source || '各社'}</div>
+      </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+function buildSocietySection(data) {
+  const arts = data.articles || [];
+  return `
+  <div class="section-header">
+    <span class="section-label">SOCIETY</span>
+    <h2>国内社会 — Japan Today</h2>
+  </div>
+  <div class="news-section">
+    <div class="columns col-3">
+      ${arts.map(a => `
+      <div class="article">
+        <div class="article-cat">${a.cat || '社会'}</div>
+        <h3>${a.title || '—'}</h3>
+        <img class="article-img" src="${a.imgUrl || 'https://picsum.photos/seed/japan/600/300'}" alt="" onerror="this.src='https://picsum.photos/seed/society/600/300'">
+        <p>${a.body || ''}</p>
+        <div class="byline">出典：${a.source || '各社'}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function buildFunnySection(data) {
+  const arts = data.articles || [];
+  return `
+  <div class="section-header">
+    <span class="section-label">ODD NEWS</span>
+    <h2>ほっこり・珍ニュース — Curious Stories</h2>
+  </div>
+  <div class="news-section">
+    <div class="columns col-2">
+      ${arts.map(a => `
+      <div class="article">
+        <div class="article-cat">😄 ${a.cat || 'おもしろ'}</div>
+        <h3>${a.title || '—'}</h3>
+        <div class="funny-box">
+          <img class="article-img" src="${a.imgUrl || 'https://picsum.photos/seed/fun/600/300'}" alt="" onerror="this.src='https://picsum.photos/seed/smile/600/300'" style="margin-bottom:8px">
+          <p>${a.body || ''}</p>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// ── MAIN ───────────────────────────────────────────────
+async function loadNews(forceRefresh = false) {
+  // Check cache
+  if (!forceRefresh) {
+    try {
+      const cached = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+      if (cached && (Date.now() - cached.ts) < CACHE_TTL) {
+        renderNewspaper(cached.data);
+        return;
+      }
+    } catch(e) {}
+  }
+
+  // Fetch fresh
+  $('loading-overlay').style.display = 'flex';
+  $('newspaper').style.display = 'none';
+
+  const results = {};
+
+  try {
+    // WORLD
+    activateStep('step-world'); setProgress(5, '世界情勢を収集中...');
+    const worldRaw = await fetchNewsFromClaude('world', prompts.world);
+    results.world = safeJSON(worldRaw) || { articles: [] };
+    doneStep('step-world'); setProgress(25, '世界ニュース取得完了');
+
+    // ECONOMY
+    activateStep('step-economy'); setProgress(30, '経済情報を分析中...');
+    const econRaw = await fetchNewsFromClaude('economy', prompts.economy);
+    results.economy = safeJSON(econRaw) || { articles: [], markets: [] };
+    doneStep('step-economy'); setProgress(50, '経済データ取得完了');
+
+    // SOCIETY
+    activateStep('step-society'); setProgress(55, '国内ニュースを収集中...');
+    const socRaw = await fetchNewsFromClaude('society', prompts.society);
+    results.society = safeJSON(socRaw) || { articles: [] };
+    doneStep('step-society'); setProgress(70, '社会ニュース取得完了');
+
+    // FUNNY
+    activateStep('step-funny'); setProgress(75, 'おもしろニュースを探索中...');
+    const funRaw = await fetchNewsFromClaude('funny', prompts.funny);
+    results.funny = safeJSON(funRaw) || { articles: [] };
+    doneStep('step-funny'); setProgress(85, 'ユニークニュース取得完了');
+
+    // IMAGE FETCH
+    activateStep('step-layout'); setProgress(88, '写真を取得中...');
+    const allSections = [
+      ...((results.world && results.world.articles) || []),
+      ...((results.economy && results.economy.articles) || []),
+      ...((results.society && results.society.articles) || []),
+      ...((results.funny && results.funny.articles) || [])
+    ];
+    await Promise.all(allSections.map(async a => {
+      if (a.imageQuery) a.imgUrl = await fetchImage(a.imageQuery);
+    }));
+
+    setProgress(98, '紙面をレイアウト中...');
+
+    // Ticker
+    results.ticker = results.world.ticker || '最新ニュースをお届けします';
+
+    // Cache
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ts: Date.now(), data: results }));
+
+  } catch(e) {
+    console.error('Fetch error:', e);
+    // Use placeholder on error
+    results.world = { articles: [{ title: 'ニュース取得に失敗しました', body: 'ネットワーク接続を確認してください。' }] };
+    results.economy = { articles: [], markets: [] };
+    results.society = { articles: [] };
+    results.funny = { articles: [] };
+    results.ticker = 'ニュースの取得中にエラーが発生しました';
+  }
+
+  setProgress(100, '完了！');
+  await new Promise(r => setTimeout(r, 500));
+  renderNewspaper(results);
+}
+
+function renderNewspaper(data) {
+  const now = new Date();
+  $('edition-date').textContent = formatDate(now);
+  $('footer-date').textContent = `更新：${now.toLocaleTimeString('ja-JP')}`;
+  $('ticker-text').textContent = data.ticker || '最新情報をお届けします';
+
+  $('news-content').innerHTML =
+    buildWorldSection(data.world || {}) +
+    buildEconomySection(data.economy || {}) +
+    buildSocietySection(data.society || {}) +
+    buildFunnySection(data.funny || {});
+
+  $('loading-overlay').style.display = 'none';
+  $('newspaper').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+// ── AUTO REFRESH at 7:00 ───────────────────────────────
+function scheduleNextUpdate() {
+  const now = new Date();
+  const next = new Date(now);
+  next.setHours(UPDATE_HOUR, 0, 0, 0);
+  if (next <= now) next.setDate(next.getDate() + 1);
+  const ms = next - now;
+
+  console.log(`次回更新：${next.toLocaleString('ja-JP')}（${Math.round(ms/60000)}分後）`);
+
+  setTimeout(async () => {
+    const status = $('update-status');
+    status.textContent = '🗞 朝刊を更新中...';
+    status.classList.add('show');
+    await loadNews(true);
+    status.textContent = '✅ 更新完了';
+    setTimeout(() => status.classList.remove('show'), 3000);
+    scheduleNextUpdate(); // reschedule
+  }, ms);
+}
+
+// ── INIT ───────────────────────────────────────────────
+loadNews();
+scheduleNextUpdate();
+</script>
+</body>
+</html>
